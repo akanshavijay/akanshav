@@ -14,7 +14,7 @@ attributes(bankloan)
 attach(bankloan)
 
 
-## convert binary variables into factor
+# convert binary variables into factor
 bankloan$`Personal Loan` = as.factor(bankloan$`Personal Loan`)
 bankloan$`Securities Account`= as.factor(bankloan$`Securities Account`)
 bankloan$`CD Account` = as.factor(bankloan$`CD Account`)
@@ -25,23 +25,23 @@ bankloan$Education = as.factor(bankloan$Education)
 attach(bankloan)
 cols = c()
 
-### check missing values
+# check missing values
 
 table(is.na(bankloan))
 colSums(is.na(bankloan))
 
-### treat na values
+# treat na values
 
 bankloan[is.na(bankloan)] = 0
 summary(bankloan)
 
-### check outliers
+# check outliers
 
 boxplot(bankloan[,2:14])
 
 
-### Univariate analysis
-### creating plot of age using ggplot
+# Univariate analysis
+# creating plot of age using ggplot
 
 library(ggplot2)
 ggplot(aes(x= `Age (in years)`), data = bankloan) + geom_histogram(binwidth = 1.25,color = 'black', fill = 'pink')+ xlab('`Age (in years)`')+ ylab('Number of customers')
@@ -52,7 +52,7 @@ ggplot(aes(x= `Family members`), data = bankloan) + geom_histogram(binwidth = 1.
 ggplot(aes(x= Mortgage), data = bankloan) + geom_histogram(binwidth = 1.25,color = 'black', fill = 'pink')+ xlab('Mortgage')+ ylab('Number of customers')
 ggplot(aes(x= CCAvg), data = bankloan) + geom_histogram(binwidth = 1.25,color = 'black', fill = 'pink')+ xlab('CCAvg')+ ylab('Number of customers')
 
-###ploting categorical variables
+# ploting categorical variables
 
 table(bankloan$Education)
 ggplot(bankloan, aes(x= bankloan$Education))+ geom_bar()+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -68,7 +68,7 @@ table(bankloan$CreditCard)
 ggplot(bankloan, aes(x= bankloan$CreditCard))+ geom_bar()+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-### bivariate analysis
+# bivariate analysis
 
 
 plot(`Personal Loan`,`Age (in years)`, main = "Scatter plot",
@@ -117,7 +117,7 @@ plot(`Personal Loan`,Online, main = "Scatter plot",
 
 
 
-### kmeans clustering
+# kmeans clustering
 
 seed=1000
 
@@ -149,7 +149,7 @@ table(bankloan$`Personal Loan_c`,clust2$cluster)
 clustprofile = aggregate(bankloan[, -c(1,8)], list(bankloan$cluster), FUN = "mean")
 print(clustprofile)
 
-### cart
+# cart
 library(caTools)
 set.seed(1000)
 sample = sample.split(bankloan, SplitRatio = 0.70)
@@ -200,22 +200,22 @@ auc
 plot(roc(train$`Personal Loan`, train$cart.score[,2]))
 
 
-### confusion matrix for cart
+# confusion matrix for cart
 
 cart_cm_train = table(train$`Personal Loan`, train$cart.pred)
 cart_cm_test = table(test$`Personal Loan`, test$cart.pred)
 
-### Error rate
+# Error rate
 
 er_train = (cart_cm_train[1,2]+ cart_cm_train[2,1])/ nrow(train)
 er_test = (cart_cm_test[1,2] + cart_cm_test[2,1])/ nrow(test)
 
-### Accuracy
+# Accuracy
 
 accuracy_train = (cart_cm_train[1,1]+ cart_cm_train[2,2])/ nrow(train)
 accuracy_test = (cart_cm_test[1,1] + cart_cm_test[2,2])/ nrow(test)
 
-#### Random Forest
+# Random Forest
 
 library(randomForest)
 library(caTools)
@@ -231,7 +231,7 @@ print(rndforest$err.rate)
 print(rndforest$importance)
 varImpPlot(rndforest)
 
-### Tune the random forest
+# Tune the random forest
 
 trndforest = tuneRF(x = train[,-c(1,9)], y = train$`Personal Loan`, mtryStart = 3, stepFactor = 1.5, nTreeTry =300, improve = 2,nodesize = 10, trace= TRUE, plot = TRUE, doBest = TRUE, importance= TRUE)
 trndforest
@@ -240,17 +240,17 @@ train$prob = predict(trndforest,train,type = "prob")
 test$predict = predict(trndforest,test,type = "class")
 test$prob = predict(trndforest,test,type = "prob")
 
-## confusion matrix for cart
+# confusion matrix for cart
 
 rf_cm_train = table(train$Personal.Loan, train$predict)
 rf_cm_test = table(test$Personal.Loan, test$predict)
 
-### Error rate
+# Error rate
 
 er_train = (rf_cm_train[1,2]+ rf_cm_train[2,1])/ nrow(train)
 er_test = (rf_cm_test[1,2] + rf_cm_test[2,1])/ nrow(test)
 
-### Accuracy
+# Accuracy
 
 accuracy_train = (rf_cm_train[1,1]+ rf_cm_train[2,2])/ nrow(train)
 accuracy_test = (rf_cm_test[1,1] + rf_cm_test[2,2])/ nrow(test)
